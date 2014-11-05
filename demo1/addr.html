@@ -261,6 +261,10 @@ select{ margin-left:5px;}
 
 							$("#street").live("change",function(){
 							
+								//清空隐藏域
+								$("#sid").remove();
+								$("#s").remove();
+								
 								//遍历option
 								$(this).children().each(function(){
 
