@@ -29,3 +29,31 @@ if( isset($_POST['pid']) && $_POST['pid']!="选择省份" ){
 		echo json_encode($rows);
 	}
 }
+
+//当接收到post的cid，加载地区信息
+if( isset($_POST['cid']) && $_POST['cid']!="选择城市" ){
+
+	$sql = "select areaID,area from area where father = ".$_POST['cid']." order by id desc";
+
+	if( $conne->getRowsNum($sql) > 0 ){
+	
+		$rows = $conne->getRowsArray($sql);
+		
+		//把二维数组转换成json格式
+		echo json_encode($rows);
+	}
+}
+
+//当接收到post的aid，查看是否还有下一级
+if( isset($_POST['aid']) && $_POST['aid']!="选择区县" ){
+
+	$sql = "select streetID,street from street where father = ".$_POST['aid']." order by id desc";
+
+	if( $conne->getRowsNum($sql) > 0 ){
+	
+		$rows = $conne->getRowsArray($sql);
+		
+		//把二维数组转换成json格式
+		echo json_encode($rows);
+	}
+}
