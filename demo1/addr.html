@@ -218,15 +218,24 @@ select{ margin-left:5px;}
 			
 			//遍历option
 			$(this).children().each(function(){
-
+		
 				if($(this).val() == $(this).parent().val()){
+				
+					//排除第一条(即"请选择")
+					if( $(this).parent().val() !== $(this).parent().children(":first").val() ){
 
-					//选中该条
-					$(this).attr("selected",true);
+						//选中该条
+						$(this).attr("selected",true);
+						
+						//把该条的id和名称放入隐藏域
+						$("#aid").val($(this).val());
+						$("#a").val($(this).text());
+					}else{
 					
-					//把该条的id放入隐藏域
-					$("#aid").val($(this).val());
-					$("#a").val($(this).text());
+						//当是第一条时，把隐藏域的值清空，无法提交
+						$("#aid").val("");
+						$("#a").val("");
+					}
 				}else{
 				
 					//没有选中的去掉之前的selected
@@ -280,8 +289,21 @@ select{ margin-left:5px;}
 										$sid.insertAfter($("#a"));
 										$s.insertAfter($("#sid"));
 
-										$("#sid").val($(this).val());
-										$("#s").val($(this).text());
+											//排除第一条(即"请选择")
+											if( $(this).parent().val() !== $(this).parent().children(":first").val() ){
+
+												//选中该条
+												$(this).attr("selected",true);
+												
+												//把该条的id和名称放入隐藏域
+												$("#sid").val($(this).val());
+												$("#s").val($(this).text());
+											}else{
+											
+												//当是第一条时，把隐藏域的值清空，无法提交
+												$("#sid").val("");
+												$("#s").val("");
+											}
 									}else{
 									
 										//没有选中的去掉之前的selected
