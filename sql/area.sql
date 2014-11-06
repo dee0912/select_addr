@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50508
 File Encoding         : 65001
 
-Date: 2014-11-05 16:21:21
+Date: 2014-11-06 09:38:43
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -3591,7 +3591,7 @@ INSERT INTO `province` VALUES ('34', '820000', '澳门特别行政区');
 DROP TABLE IF EXISTS `street`;
 CREATE TABLE `street` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `streetID` varchar(6) DEFAULT '',
+  `streetID` varchar(9) DEFAULT '',
   `street` varchar(40) DEFAULT '',
   `father` varchar(6) DEFAULT '',
   PRIMARY KEY (`id`)
@@ -3600,4 +3600,4 @@ CREATE TABLE `street` (
 -- ----------------------------
 -- Records of street
 -- ----------------------------
-INSERT INTO `street` VALUES ('1', '130181', '和睦井乡', '130181');
+INSERT INTO `street` VALUES ('1', '13018001', '和睦井乡', '130181');
