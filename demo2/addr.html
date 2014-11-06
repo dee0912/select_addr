@@ -75,6 +75,9 @@ form{ margin-top:20px; margin-left:20px;}
 
 	</form>
 	
+	<!--缓存数据-->
+	<input type="hidden" id="pdata" name="pdata">
+
 	<script>
 	
 		$(function(){
@@ -102,29 +105,55 @@ form{ margin-top:20px; margin-left:20px;}
 				
 				if( $("#provincetab").length == 0 ){
 					
-					//使用ajax获取省份信息
-					$.post("../sel2.php",{
-						city:true
-					},function(data,textStatus){
-					
-						//接收json数据
-						var dataObj = eval("("+data+")"); //转换为json对象 
+					//如果有缓存数据
+					//if($("#pdata").val() != ""){
 
-						$.each(dataObj,function(idx,item){ 
-												 
-							//给下拉面板加上ID
-							$dropdiv.attr("id","provincetab").css({"top":"25px","left":"0px"});
-							$dropdiv.insertAfter($(".sel:eq(0)"));
-							
-							//把获取到的数据追加至面板中
-							if( $("#provincetab .span-new").length < dataObj.length ){
+						//使用ajax获取省份信息
+						$.post("../sel2.php",{
+							city:true
+						},function(data,textStatus){
+						
+							//接收json数据
+							var dataObj = eval("("+data+")"); //转换为json对象 
 
-								$span_new = $("<span class=\"span-new\" id=\""+item.provinceID+"\">"+item.province+"</span>");
-								$span_new.appendTo($("#provincetab"));
-							}
-						})
+							//缓存数据
+							$("#pdata").val(data);
 
-					});
+							$.each(dataObj,function(idx,item){ 
+													 
+								//给下拉面板加上ID
+								$dropdiv.attr("id","provincetab").css({"top":"25px","left":"0px"});
+								$dropdiv.insertAfter($(".sel:eq(0)"));
+								
+								//把获取到的数据追加至面板中
+								if( $("#provincetab .span-new").length < dataObj.length ){
+
+									$span_new = $("<span class=\"span-new\" id=\""+item.provinceID+"\">"+item.province+"</span>");
+									$span_new.appendTo($("#provincetab"));
+								}
+							})
+
+						});
+					//}
+//					else{
+//					
+//						//取出缓存数据
+//						var dataObj = eval("("+$("#pdata").val()+")"); 
+//
+//						$.each(dataObj,function(idx,item){ 
+//													 
+//							//给下拉面板加上ID
+//							$dropdiv.attr("id","provincetab").css({"top":"25px","left":"0px"});
+//							$dropdiv.insertAfter($(".sel:eq(0)"));
+//							
+//							//把获取到的数据追加至面板中
+//							if( $("#provincetab .span-new").length < dataObj.length ){
+//
+//								$span_new = $("<span class=\"span-new\" id=\""+item.provinceID+"\">"+item.province+"</span>");
+//								$span_new.appendTo($("#provincetab"));
+//							}
+//						})
+//					}
 
 				}else{
 				
@@ -203,6 +232,25 @@ form{ margin-top:20px; margin-left:20px;}
 				$("#citytab .span-new").remove();
 				$("#citytab").remove();
 			});
+
+
+
+
+			/**************************
+			* 点击二级菜单 - 城市时  *
+			***************************/
+			$("#city").click(function(){
+			
+				//当下拉面板不存在时
+				if( $("#citytab").length == 0 ){
+				
+					
+				}else{
+				
+					$("#citytab").remove();
+				}
+			});
+
 
 
 
