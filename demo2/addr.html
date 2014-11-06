@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>仿亚马逊 - 动态添加的多级联动菜单</title>
+<style>
+body,html{ font-size:14px;}
+form{ margin-top:20px; margin-left:20px;}
+
+/* 选择框 */
+.con{ float:left; margin-right:10px; position:relative;}
+.sel{ 
+	
+	padding:4px 23px 3px 5px;
+	border:1px solid #ccc;
+	background:url("images/dropdown_bg.gif") right 2px no-repeat;
+}
+.sel:hover{ 
+
+	text-decoration:underline;
+	cursor:pointer;
+}
+
+/* 下拉面板 */
+.dropdiv{
+
+	width:500px;
+	margin: 0;
+	border: solid 1px #cbe3f7;
+	padding: 7px 0 15px 15px;
+	background-color: #fff;
+	position:absolute;
+
+	font-size:12px;
+}
+/* 省市信息 */
+.span-new{ 
+	
+	display:inline-block;
+	width:110px;
+	padding-right:15px;
+	line-height:24px;
+
+	color:rgb(0, 75, 145);
+	cursor:pointer;
+}
+
+.span-new:hover{ text-decoration:underline; color:orange;}
+
+.cls{ clear:both;}
+</style>
+<script src="../js/jquery-1.8.3.min.js"></script>
+</head>
+<body>
+
+	<form id="sel-form">
+	
+		<div id="pcon" class="con">
+			<div id="province" class="sel">请选择省</div>
+		</div>
+
+		<div id="ccon" class="con">
+			<div id="city" class="sel">请选择城市</div>
+		</div>
+
+		<div id="acon" class="con">
+			<div id="area" class="sel">请选择区县</div>
+		</div>
+
+		<div class="cls"></div>
+
+		<!-- 隐藏域 -->
+		<input type="hidden" id="pid" name="pid">
+		<input type="hidden" id="cid" name="cid">
+
+	</form>
+	
+	<script>
+	
+		$(function(){
+		
+			//初始状态下只有第一级菜单显示可用(黑色字体)，后级菜单显示不可用(灰色字体)
+			$(".sel:gt(0)").css("color","#ccc");
+
+			//定义下拉面板
+			$dropdiv = $("<div class='dropdiv'></div");
+
+
+
+			/*******************
+			* 点击第一级菜单  *
+			********************/
+			$("#province").click(function(){
+				
+				//可以封装函数
+				//删除后级 - 城市菜单单条信息
+				$("#citytab .span-new").remove();
+				//删除后级 - 城市菜单信息
+				$("#city").text("请选择城市");
+				//清空后级对应的隐藏域
+				$("#cid").val("");
+				
+				if( $("#provincetab").length == 0 ){
+					
+					//使用ajax获取省份信息
+					$.post("../sel2.php",{
+						city:true
+					},function(data,textStatus){
+					
+						//接收json数据
+						var dataObj = eval("("+data+")"); //转换为json对象 
+
+						$.each(dataObj,function(idx,item){ 
+												 
+							//给下拉面板加上ID
+							$dropdiv.attr("id","provincetab").css({"top":"25px","left":"0px"});
+							$dropdiv.insertAfter($(".sel:eq(0)"));
+							
+							//把获取到的数据追加至面板中
+							if( $("#provincetab .span-new").length < dataObj.length ){
+
+								$span_new = $("<span class=\"span-new\" id=\""+item.provinceID+"\">"+item.province+"</span>");
+								$span_new.appendTo($("#provincetab"));
+							}
+						})
+
+					});
+
+				}else{
+				
+					//当下拉面板已经存在时点击一级菜单，删除下拉面板
+					$("#provincetab").remove();
+				}
+
+			//$("#province").click(function(){})结束
+			});
+
+
+
+
+			/*******************
+			* 点击单条省份时  *
+			********************/
+			$("#provincetab .span-new").live("click",function(){
+			
+				//省份选择框
+				$("#province").text($(this).text());
+
+				//隐藏域信息
+				$("#pid").val($(this).attr("id"));
+
+				//删除省菜单信息
+				$("#provincetab .span-new").remove();
+			
+				//后级 - 城市菜单弹出
+				//使用ajax获取省份信息
+				if( $("#citytab").length == 0 ){
+
+					$.post("../sel2.php",{
+						pid : $("#pid").val()
+					},function(data,textStatus){
+					
+						//接收json数据
+						var dataObj = eval("("+data+")"); //转换为json对象 
+
+						$.each(dataObj,function(idx,item){ 
+												 
+							//给下拉面板加上ID
+							$dropdiv.attr("id","citytab").css({"top":"24px","left":"0px"});
+							$("#citytab").appendTo($("#ccon"));
+							
+							//后级菜单文字颜色
+							$("#city").css("color","#000");
+							
+							//把获取到的数据追加至面板中
+							if( $("#city .span-new").length < dataObj.length ){
+
+								$span_new = $("<span class=\"span-new\" id=\""+item.cityID+"\">"+item.city+"</span>");
+								$span_new.appendTo($("#citytab"));
+							}
+						});
+					});
+				}				
+			
+			//$("#provincetab .span-new").live("click",function(){})结束
+			});
+
+	
+			
+
+			/*******************
+			* 点击单条城市时  *
+			********************/			
+			$("#citytab .span-new").live("click",function(){
+			
+				//城市选择菜单
+				$("#city").text($(this).text());
+
+				//隐藏域信息
+				$("#cid").val($(this).attr("id"));
+
+				//删除城市菜单单条信息
+				$("#citytab .span-new").remove();
+				$("#citytab").remove();
+			});
+
+
+
+
+		//$(function(){})结束
+		});
+
+	</script>
+</body>
+</html>

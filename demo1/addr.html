@@ -6,7 +6,7 @@
 <style>
 select{ margin-left:5px;}
 </style>
-<script src="js/jquery-1.8.3.min.js"></script>
+<script src="../js/jquery-1.8.3.min.js"></script>
 </head>
 <body>
 
@@ -52,7 +52,7 @@ select{ margin-left:5px;}
 	$(function(){
 	
 		//ajax方式加载第一级菜单 - 省份
-		$.post("sel.php",{
+		$.post("../sel.php",{
 			city:true
 		},function(data,textStatus){
 		
@@ -109,7 +109,7 @@ select{ margin-left:5px;}
 			});
 
 			//选中省份之后，使用ajax获取第二季菜单 - 城市
-			$.post("sel.php",{
+			$.post("../sel.php",{
 				pid : $("#pid").val()
 			},function(data,textStatus){
 			
@@ -175,7 +175,7 @@ select{ margin-left:5px;}
 			});	
 
 			//选中城市之后，使用ajax获取第三季菜单 - 地区
-			$.post("sel.php",{
+			$.post("../sel.php",{
 				cid : $("#cid").val()
 			},function(data,textStatus){
 			
@@ -245,7 +245,7 @@ select{ margin-left:5px;}
 			});	
 
 			//检测是否还有下一级
-			$.post("sel.php",{aid:$("#aid").val()},function(data,textStatus){
+			$.post("../sel.php",{aid:$("#aid").val()},function(data,textStatus){
 			
 				//如果有返回值
 				if(data){
