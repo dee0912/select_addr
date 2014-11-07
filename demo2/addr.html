@@ -47,13 +47,16 @@ form{ margin-top:20px; margin-left:20px;}
 
 .span-new:hover{ text-decoration:underline; color:orange;}
 
+/*结果*/
+#result{ margin:20px;}
+
 .cls{ clear:both;}
 </style>
 <script src="../js/jquery-1.8.3.min.js"></script>
 </head>
 <body>
 
-	<form id="sel-form">
+	<form id="sel-form" action="addr.php" method="post">
 	
 		<div id="pcon" class="con">
 			<div id="province" class="sel">请选择省</div>
@@ -68,15 +71,33 @@ form{ margin-top:20px; margin-left:20px;}
 		</div>
 
 		<div class="cls"></div>
+		<br>
+		<input type="submit" id="sub" value="提交">
 
 		<!-- 隐藏域 -->
 		<input type="hidden" id="pid" name="pid">
+		<input type="hidden" id="p" name="p">
 		<input type="hidden" id="cid" name="cid">
+		<input type="hidden" id="c" name="c">
+		<input type="hidden" id="aid" name="aid">
+		<input type="hidden" id="a" name="a">
+		<input type="hidden" id="sid" name="sid">
+		<input type="hidden" id="s" name="s">
 
 	</form>
 	
 	<!--缓存数据-->
 	<input type="hidden" id="pdata" name="pdata">
+
+	<!-- 显示选择的结果 -->
+	<div id="result">
+		省份：<{$pid}> - <{$p}><br>
+		城市：<{$cid}> - <{$c}><br>
+		区县：<{$aid}> - <{$a}><br>
+		<{if $sid && $s }>
+		街道：<{$sid}> - <{$s}>
+		<{/if}>
+	</div>
 
 	<script>
 	
@@ -97,12 +118,26 @@ form{ margin-top:20px; margin-left:20px;}
 			$("#province").click(function(){
 				
 				//可以封装函数
-				//删除后级 - 城市菜单单条信息
+				//删除后级 - 菜单单条信息
 				$("#citytab .span-new").remove();
-				//删除后级 - 城市菜单信息
+				$("#areatab .span-new").remove();
+				$("#streettab .span-new").remove();
+				$("#citytab").remove();
+				$("#areatab").remove();
+				$("#streettab").remove();
+				//删除后级 - 菜单信息
 				$("#city").text("请选择城市");
+				$("#area").text("请选择区县");
 				//清空后级对应的隐藏域
 				$("#cid").val("");
+				$("#c").val("");
+				$("#aid").val("");
+				$("#a").val("");
+				$("#sid").val("");
+				$("#s").val("");
+				//后级文字颜色
+				$("#city").css("color","#ccc");
+				$("#area").css("color","#ccc");
 				
 				if( $("#provincetab").length == 0 ){
 					
@@ -179,9 +214,12 @@ form{ margin-top:20px; margin-left:20px;}
 
 				//隐藏域信息
 				$("#pid").val($(this).attr("id"));
+				$("#p").val($(this).text());
+
 				$pid = $("#pid").val();
+
 				//给$pid加上城市标识c，防止jQuery错误识别id
-				$pid4id = "c"+$pid 
+				$pid4id = "c"+$pid; 
 
 				//同时创建以该省id为id的input隐藏域id=c+pid，用作缓存城市数据
 				if($('#'+$pid4id).length == 0){
@@ -285,10 +323,84 @@ form{ margin-top:20px; margin-left:20px;}
 
 				//2.城市id存入页面隐藏域
 				$("#cid").val($(this).attr("id"));
+				$("#c").val($(this).text());
+
+				$cid = $("#cid").val();
 
 				//3.城市面板消失
 				$("#citytab .span-new").remove();
 				$("#citytab").remove();
+				
+				//4.在dom中插入城市后级 - 区域下拉面板
+				//给$cid加上城市标识c，防止jQuery错误识别id
+				$cid4id = "c"+$cid;
+
+				//同时创建以该城市id为id的input隐藏域id=c+cid，用作缓存区县数据
+				//创建隐藏域
+				if($('#'+$cid4id).length == 0){
+
+					$bufferArea = $("<input type='hidden' id='"+$cid4id+"'>");
+					$bufferArea.insertAfter($("#pdata"));
+				}
+
+				//检查是否有缓存数据  
+				if($("#"+$cid4id+"").val() == ""){
+
+					$id = $(this).attr("id");
+					$id4id = "a"+$id;
+
+					//使用ajax获取省份信息
+					if( $("#areatab").length == 0 ){
+
+						$.post("../sel2.php",{
+							cid : $("#cid").val()
+						},function(data,textStatus){
+						
+							//接收json数据
+							var dataObj = eval("("+data+")"); //转换为json对象 
+
+							//同时缓存对应城市的城市数据
+							$("#"+$cid4id).val(data);
+
+							$.each(dataObj,function(idx,item){ 
+													 
+								//给下拉面板加上ID
+								$dropdiv.attr("id","areatab").css({"top":"24px","left":"0px"});
+								$dropdiv.appendTo($("#acon"));
+								
+								//后级菜单文字颜色
+								$("#area").css("color","#000");
+								
+								//把获取到的数据追加至面板中
+								if( $("#area .span-new").length < dataObj.length ){
+
+									$span_new = $("<span class=\"span-new\" id=\""+item.areaID+"\">"+item.area+"</span>");
+									$span_new.appendTo($("#areatab"));
+								}
+							});
+						});
+					}				
+				}else{
+
+					//取出缓存数据
+					var $bufferData = $('#'+$cid4id).val();					
+					var dataObj = eval("("+$bufferData+")"); 
+
+					//给下拉面板加上ID
+					$dropdiv.attr("id","areatab").css({"top":"24px","left":"0px"});
+					$dropdiv.appendTo($("#acon"));
+						
+					$.each(dataObj,function(idx,item){ 
+													 
+						//把获取到的数据追加至面板中
+						if( $("#area .span-new").length < dataObj.length ){
+
+							$span_new = $("<span class=\"span-new\" id=\""+item.areaID+"\">"+item.area+"</span>");
+							$span_new.appendTo($("#areatab"));
+						}
+					});
+				}
+				
 			});
 
 
@@ -299,44 +411,272 @@ form{ margin-top:20px; margin-left:20px;}
 			***************************/
 			$("#city").click(function(){
 			
-				//当下拉面板不存在时
-				if( $("#citytab").length == 0 ){
-	
-					//根据表单中的省份id的隐藏域和表单外省份id=c+id的隐藏域的id进行对比，从页面缓存中读取数据
-					$pid = $("#pid").val();
-									
+				if($("#pid").val() != ""){
+				
+					//删除后级 - 菜单信息
+					$("#areatab .span-new").remove();
+					$("#streettab .span-new").remove();
+					$("#streettab").remove();
+					$("#aid").val("");
+					$("#a").val("");
+					$("#sid").val("");
+					$("#s").val("");
+					$("#street").remove();
+					//后级菜单文字颜色
+					$("#area").css("color","#ccc");
+					$("#area").text("请选择区县");
+					
+					//当下拉面板不存在时
+					if( $("#citytab").length == 0 ){
+		
+						//根据表单中的省份id的隐藏域和表单外省份id=c+id的隐藏域的id进行对比，从页面缓存中读取数据
+						$pid = $("#pid").val();
+										
+						//存在缓存，直接从页面的隐藏域读取数据
+						//取出缓存数据
+						var $bufferData = $('#c'+$pid).val();	
+		
+						var dataObj = eval("("+$bufferData+")"); 
+							
+						//给下拉面板加上ID
+						$dropdiv.attr("id","citytab").css({"top":"24px","left":"0px"});
+						//注意：此处不能使用$("#citytab")
+						$dropdiv.appendTo($("#ccon"));
+
+						$.each(dataObj,function(idx,item){ 
+																		
+							//把获取到的数据追加至面板中
+							if( $("#city .span-new").length < dataObj.length ){
+
+								$span_new = $("<span class=\"span-new\" id=\""+item.cityID+"\">"+item.city+"</span>");
+								$span_new.appendTo($("#citytab"));
+							}
+						});
+						
+					}else{
+
+						$("#citytab .span-new").remove();
+						$("#citytab").remove();
+					}
+				}
+			});
+
+
+
+			/*******************
+			* 点击单条区域时  *
+			********************/
+			/******************************************
+			*	7个动作:                              *
+			*										  *
+			*	1.区域名称添加进城市选择框			  *					 	   
+			*  	2.区域id存入页面隐藏域				  *
+			*	3.区域面板消失			              *
+			*	4.检测是否含有下级数据,如果有则追加  *
+			*	5.请求区县后级 - 街道的数据			  *
+			*	6.把该数据追加至区县街道面板中		  *
+			*	7.同时把该数据缓存在页面中			  *
+			*										  *
+			*******************************************/
+			$("#areatab .span-new").live("click",function(){
+			
+				//1.区域名称添加进城市选择框	
+				$("#area").text($(this).text());
+				$("#area").css("color","#000");
+
+				//2.区域id存入页面隐藏域
+				$("#aid").val($(this).attr("id"));
+				$("#a").val($(this).text());
+
+				$sid4id = "s"+$("#aid").val();
+				//创建隐藏域
+				if($('#'+$sid4id).length == 0){
+
+					$bufferArea = $("<input type='hidden' id='"+$sid4id+"'>");
+					$bufferArea.insertAfter($("#pdata"));
+				}
+
+				//3.区域面板消失
+				$(this).siblings().remove();				
+				$(this).parent().remove();
+				$(this).remove();
+
+				//先检查是否有缓存
+				if($("#"+$sid4id).val() == ""){
+
+					//4.如果没有缓存的话再检测是否含有下级数据,如果有则追加
+					$.post("../sel2.php",{
+						aid : $("#aid").val()
+					},function(data,textStatus){
+					
+						//如果有返回值
+						if(data){
+
+							//动态添加下一级菜单
+							$street = $("<div id=\"scon\" class=\"con\"><div id=\"street\" class=\"sel\">选择街道</div></div>");
+							$street.insertAfter($("#acon"));
+						
+							//接收json数据
+							var dataObj = eval("("+data+")"); //转换为json对象 
+
+							//同时缓存对应城市的街道数据
+							$("#"+$sid4id).val(data);
+
+							$.each(dataObj,function(idx,item){ 
+													 
+								//给下拉面板加上ID
+								$dropdiv.attr("id","streettab").css({"top":"24px","left":"0px"});
+								$dropdiv.appendTo($("#scon"));
+								
+								
+								//把获取到的数据追加至面板中
+								if( $("#street .span-new").length < dataObj.length ){
+
+									$span_new = $("<span class=\"span-new\" id=\""+item.streetID+"\">"+item.street+"</span>");
+									$span_new.appendTo($("#streettab"));
+								}
+							});
+						}
+					});
+				
+				}else{
+					
 					//存在缓存，直接从页面的隐藏域读取数据
 					//取出缓存数据
-					var $bufferData = $('#c'+$pid).val();	
+					var $bufferData = $("#"+$sid4id).val();	
 	
 					var dataObj = eval("("+$bufferData+")"); 
+
+					//动态添加下一级菜单
+					$street = $("<div id=\"scon\" class=\"con\"><div id=\"street\" class=\"sel\">选择街道</div></div>");
+					$street.insertAfter($("#acon"));
 						
 					//给下拉面板加上ID
-					$dropdiv.attr("id","citytab").css({"top":"24px","left":"0px"});
-					//注意：此处不能使用$("#citytab")
-					$dropdiv.appendTo($("#ccon"));
+					$dropdiv.attr("id","streettab").css({"top":"24px","left":"0px"});
+					$dropdiv.appendTo($("#scon"));
 
 					$.each(dataObj,function(idx,item){ 
 												 					
 						//把获取到的数据追加至面板中
-						if( $("#city .span-new").length < dataObj.length ){
+						if( $("#street .span-new").length < dataObj.length ){
 
-							$span_new = $("<span class=\"span-new\" id=\""+item.cityID+"\">"+item.city+"</span>");
-							$span_new.appendTo($("#citytab"));
+							$span_new = $("<span class=\"span-new\" id=\""+item.streetID+"\">"+item.street+"</span>");
+							$span_new.appendTo($("#streettab"));
 						}
 					});
-					
-				}else{
 
-					$("#citytab .span-new").remove();
-					$("#citytab").remove();
+				}
+
+			});
+
+			/**************************
+			* 点击三级菜单 - 区域时  *
+			***************************/
+			/******************************************************
+			*	4个动作:                                          *
+			*										              *
+			*	1.如果存在下拉面板，则下拉面板消失	              *			 
+			*  	2.如果不存在下拉面板，则查看是否有缓存数据	      *
+			*	3.如果没有缓存数据,则通过ajax获取,同时缓存数据   *
+			*	4.如果存在缓存数据，则直接读取                   *
+			*										              *
+			*******************************************************/
+			$("#area").click(function(){
+			
+				if($("#cid").val() != ""){
+				
+					//删除后级 - 菜单信息
+					$("#streettab .span-new").remove();
+					$("#streettab").remove();
+					$("#sid").val("");
+					$("#s").val("");
+					$("#street").remove();
+					
+					//当下拉面板不存在时
+					if( $("#areatab").length == 0 ){
+		
+						//根据表单中的城市id的隐藏域和表单外省份id=a+id的隐藏域的id进行对比，从页面缓存中读取数据
+						$cid = $("#cid").val();
+							
+						//存在缓存，直接从页面的隐藏域读取数据
+						//取出缓存数据
+						var $bufferData = $('#c'+$cid).val();	
+		
+						var dataObj = eval("("+$bufferData+")"); 
+							
+						//给下拉面板加上ID
+						$dropdiv.attr("id","areatab").css({"top":"24px","left":"0px"});
+						//注意：此处不能使用$("#citytab")
+						$dropdiv.appendTo($("#acon"));
+
+						$.each(dataObj,function(idx,item){ 
+																		
+							//把获取到的数据追加至面板中
+							if( $("#area .span-new").length < dataObj.length ){
+
+								$span_new = $("<span class=\"span-new\" id=\""+item.areaID+"\">"+item.area+"</span>");
+								$span_new.appendTo($("#areatab"));
+							}
+						});
+						
+					}else{
+
+						$("#areatab .span-new").remove();
+						$("#areatab").remove();
+					}
 				}
 			});
 
 
 
 
+			/*******************
+			* 点击单条街道时  *
+			********************/
+			/******************************************
+			*	3个动作:                              *
+			*										  *
+			*	1.街道名称添加进街道选择框			  *					 	   
+			*  	2.街道id存入页面隐藏域				  *
+			*	3.街道面板消失			              *
+			*										  *
+			*******************************************/
+			$("#streettab .span-new").live("click",function(){
+			
+				//1.区域名称添加进城市选择框	
+				$("#street").text($(this).text());
+				$("#street").css("color","#000");
 
+				//2.区域id存入页面隐藏域
+				$("#sid").val($(this).attr("id"));
+				$("#s").val($(this).text());
+
+				//3.区域面板消失
+				$(this).siblings().remove();				
+				$(this).parent().remove();
+				$(this).remove();
+			});
+
+
+		//如果有一栏为空或者不可用，不允许提交
+		$("#sub").click(function(){
+		
+			if($("#street").length == 0){ 
+
+				if($("#pid").val() == "" || $("#p").val() == "" || $("#cid").val() == "" || $("#c").val() == "" || $("#aid").val() == "" || $("#a").val() == "" || $("#city").attr("disabled") === true || $("#area").attr("disabled") === true){
+			
+					alert("请完成选择");
+					return false;
+				}
+			}else{
+		
+				if($("#pid").val() == "" || $("#p").val() == "" || $("#cid").val() == "" || $("#c").val() == "" || $("#aid").val() == "" || $("#a").val() == "" || $("#city").attr("disabled") === true || $("#area").attr("disabled") === true || $("#s").length == 0 || $("#s").val() == "" || $("#sid").length == 0 || $("#sid").val() == ""){
+			
+					alert("请完成选择");
+					return false;
+				}
+			}
+		});
 
 
 		//$(function(){})结束
