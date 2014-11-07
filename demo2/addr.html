@@ -90,6 +90,7 @@ form{ margin-top:20px; margin-left:20px;}
 
 
 
+
 			/*******************
 			* 点击第一级菜单  *
 			********************/
@@ -179,6 +180,7 @@ form{ margin-top:20px; margin-left:20px;}
 				//隐藏域信息
 				$("#pid").val($(this).attr("id"));
 				$pid = $("#pid").val();
+				//给$pid加上城市标识c，防止jQuery错误识别id
 				$pid4id = "c"+$pid 
 
 				//同时创建以该省id为id的input隐藏域id=c+pid，用作缓存城市数据
@@ -236,15 +238,15 @@ form{ margin-top:20px; margin-left:20px;}
 					var $bufferData = $('#'+$pid4id).val();					
 					var dataObj = eval("("+$bufferData+")"); 
 
+					//给下拉面板加上ID
+					$dropdiv.attr("id","citytab").css({"top":"24px","left":"0px"});
+					$("#citytab").appendTo($("#ccon"));
+						
+					//后级菜单文字颜色
+					$("#city").css("color","#000");
+
 					$.each(dataObj,function(idx,item){ 
 													 
-						//给下拉面板加上ID
-						$dropdiv.attr("id","citytab").css({"top":"24px","left":"0px"});
-						$("#citytab").appendTo($("#ccon"));
-						
-						//后级菜单文字颜色
-						$("#city").css("color","#000");
-						
 						//把获取到的数据追加至面板中
 						if( $("#city .span-new").length < dataObj.length ){
 
@@ -262,16 +264,29 @@ form{ margin-top:20px; margin-left:20px;}
 
 			/*******************
 			* 点击单条城市时  *
-			********************/			
+			********************/
+			/******************************************
+			*	8个动作:                              *
+			*										  *
+			*	1.城市名称添加进城市选择框			  *					 	   
+			*  	2.城市id存入页面隐藏域				  *
+			*	3.城市面板消失			              *
+			*	4.在dom中插入城市后级 - 区域下拉面板 *
+			*	5.请求城市后级 - 区县的数据			  *
+			*	6.把该数据追加至区县面板中			  *
+			*	7.同时把该数据缓存在页面中			  *
+			*	8.检测是否含有下级数据,如果有则追加  *
+			*										  *	
+			*******************************************/			
 			$("#citytab .span-new").live("click",function(){
 			
-				//城市选择菜单
+				//1.城市名称添加进城市选择框
 				$("#city").text($(this).text());
 
-				//隐藏域信息
+				//2.城市id存入页面隐藏域
 				$("#cid").val($(this).attr("id"));
 
-				//删除城市菜单单条信息
+				//3.城市面板消失
 				$("#citytab .span-new").remove();
 				$("#citytab").remove();
 			});
@@ -286,16 +301,39 @@ form{ margin-top:20px; margin-left:20px;}
 			
 				//当下拉面板不存在时
 				if( $("#citytab").length == 0 ){
-				
-					//首先检查是否有缓存数据
-					
+	
+					//根据表单中的省份id的隐藏域和表单外省份id=c+id的隐藏域的id进行对比，从页面缓存中读取数据
+					$pid = $("#pid").val();
+									
+					//存在缓存，直接从页面的隐藏域读取数据
+					//取出缓存数据
+					var $bufferData = $('#c'+$pid).val();	
+	
+					var dataObj = eval("("+$bufferData+")"); 
+						
+					//给下拉面板加上ID
+					$dropdiv.attr("id","citytab").css({"top":"24px","left":"0px"});
+					//注意：此处不能使用$("#citytab")
+					$dropdiv.appendTo($("#ccon"));
 
+					$.each(dataObj,function(idx,item){ 
+												 					
+						//把获取到的数据追加至面板中
+						if( $("#city .span-new").length < dataObj.length ){
+
+							$span_new = $("<span class=\"span-new\" id=\""+item.cityID+"\">"+item.city+"</span>");
+							$span_new.appendTo($("#citytab"));
+						}
+					});
+					
 				}else{
-				
+
 					$("#citytab .span-new").remove();
 					$("#citytab").remove();
 				}
 			});
+
+
 
 
 
