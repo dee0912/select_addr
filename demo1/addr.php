@@ -1,6 +1,6 @@
 <?php
 
-require '../init.inc.php';
+require 'init.inc.php';
 
 //接收表单的参数
 if(isset($_POST['pid']) && $_POST['pid'] != ""){

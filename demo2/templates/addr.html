@@ -13,7 +13,7 @@ form{ margin-top:20px; margin-left:20px;}
 	
 	padding:4px 23px 3px 5px;
 	border:1px solid #ccc;
-	background:url("images/dropdown_bg.gif") right 2px no-repeat;
+	background:url("templates/images/dropdown_bg.gif") right 2px no-repeat;
 }
 .sel:hover{ 
 
@@ -145,7 +145,7 @@ form{ margin-top:20px; margin-left:20px;}
 					if($("#pdata").val() == ""){
 
 						//使用ajax获取省份信息
-						$.post("../sel2.php",{
+						$.post("sel2.php",{
 							city:true
 						},function(data,textStatus){
 
@@ -242,7 +242,7 @@ form{ margin-top:20px; margin-left:20px;}
 					//使用ajax获取省份信息
 					if( $("#citytab").length == 0 ){
 
-						$.post("../sel2.php",{
+						$.post("sel2.php",{
 							pid : $("#pid").val()
 						},function(data,textStatus){
 						
@@ -351,7 +351,7 @@ form{ margin-top:20px; margin-left:20px;}
 					//使用ajax获取省份信息
 					if( $("#areatab").length == 0 ){
 
-						$.post("../sel2.php",{
+						$.post("sel2.php",{
 							cid : $("#cid").val()
 						},function(data,textStatus){
 						
@@ -504,7 +504,7 @@ form{ margin-top:20px; margin-left:20px;}
 				if($("#"+$sid4id).val() == ""){
 
 					//4.如果没有缓存的话再检测是否含有下级数据,如果有则追加
-					$.post("../sel2.php",{
+					$.post("sel2.php",{
 						aid : $("#aid").val()
 					},function(data,textStatus){
 					

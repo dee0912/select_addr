@@ -48,25 +48,21 @@ select{ margin-left:5px;}
 	<{/if}>
 </body>
 <script>
-
 	$(function(){
 	
 		//ajax方式加载第一级菜单 - 省份
-		$.post("../sel.php",{
+		$.post("sel.php",{
 			city:true
 		},function(data,textStatus){
 		
 			//接收json数据
 			var dataObj = eval("("+data+")"); //转换为json对象 
-
 			$.each(dataObj,function(idx,item){ 
 									 
 				$option_new = $("<option value=\""+item.provinceID+"\">"+item.province+"</option>");
 				$option_new.insertAfter($("#province").children(":first"));
 			})
-
 		});
-
 		
 		//选择第一级菜单 - 省份
 		$("#province").bind("change",function(){
@@ -74,14 +70,11 @@ select{ margin-left:5px;}
 			//第三级菜单 - 地区不可用
 			$(this).nextAll().children().removeAttr("selected");
 			$(this).siblings("select").attr("disabled",true);
-
-
 			//同时清除隐藏域
 			$("#cid").val("");
 			$("#c").val("");
 			$("#aid").val("");
 			$("#a").val("");
-
 			if($("#street").length > 0){
 			
 				$("#street").remove();
@@ -91,9 +84,7 @@ select{ margin-left:5px;}
 			
 			//遍历option
 			$(this).children().each(function(){
-
 				if($(this).val() == $(this).parent().val()){
-
 					//选中该条
 					$(this).attr("selected",true);
 					
@@ -105,26 +96,21 @@ select{ margin-left:5px;}
 					//没有选中的去掉之前的selected
 					$(this).removeAttr("selected");
 				}
-
 			});
-
 			//选中省份之后，使用ajax获取第二季菜单 - 城市
-			$.post("../sel.php",{
+			$.post("sel.php",{
 				pid : $("#pid").val()
 			},function(data,textStatus){
 			
 				//如果有返回值
 				if(data){
-
 					//城市菜单可用
 					$("#city").attr("disabled",false);
-
 					//删除之前选择省份加载的城市
 					$("#city").children(":not(:first)").remove();
 					
 					//接收json数据
 					var dataObj = eval("("+data+")"); //转换为json对象 
-
 					$.each(dataObj,function(idx,item){ 
 											 
 						$option_new = $("<option value=\""+item.cityID+"\">"+item.city+"</option>");
@@ -138,16 +124,13 @@ select{ margin-left:5px;}
 					$("#city").attr("disabled",true);
 				}
 			});
-
 		});
-
 		//选择第二级菜单 - 城市
 		$("#city").bind("change",function(){
 		
 			//清除下一级菜单的隐藏域
 			$("#aid").val("");
 			$("#a").val("");
-
 			if($("#street").length > 0){
 			
 				$("#street").remove();
@@ -157,9 +140,7 @@ select{ margin-left:5px;}
 			
 			//遍历option
 			$(this).children().each(function(){
-
 				if($(this).val() == $(this).parent().val()){
-
 					//选中该条
 					$(this).attr("selected",true);
 					
@@ -171,26 +152,21 @@ select{ margin-left:5px;}
 					//没有选中的去掉之前的selected
 					$(this).removeAttr("selected");
 				}
-
 			});	
-
 			//选中城市之后，使用ajax获取第三季菜单 - 地区
-			$.post("../sel.php",{
+			$.post("sel.php",{
 				cid : $("#cid").val()
 			},function(data,textStatus){
 			
 				//如果有返回值
 				if(data){
-
 					//城市菜单可用
 					$("#area").attr("disabled",false);
-
 					//删除之前选择省份加载的区县
 					$("#area").children(":not(:first)").remove();
 					
 					//接收json数据
 					var dataObj = eval("("+data+")"); //转换为json对象 
-
 					$.each(dataObj,function(idx,item){ 
 											 
 						$option_new = $("<option value=\""+item.areaID+"\">"+item.area+"</option>");
@@ -205,7 +181,6 @@ select{ margin-left:5px;}
 				}
 			});
 		});
-
 		//选择第三级菜单 - 地区
 		$("#area").bind("change",function(){
 		
@@ -223,7 +198,6 @@ select{ margin-left:5px;}
 				
 					//排除第一条(即"请选择")
 					if( $(this).parent().val() !== $(this).parent().children(":first").val() ){
-
 						//选中该条
 						$(this).attr("selected",true);
 						
@@ -241,33 +215,26 @@ select{ margin-left:5px;}
 					//没有选中的去掉之前的selected
 					$(this).removeAttr("selected");
 				}
-
 			});	
-
 			//检测是否还有下一级
-			$.post("../sel.php",{aid:$("#aid").val()},function(data,textStatus){
+			$.post("sel.php",{aid:$("#aid").val()},function(data,textStatus){
 			
 				//如果有返回值
 				if(data){
-
 					//动态添加下一级菜单
 					$street = $("<select id=\"street\"><option>选择街道</option></select>");
 					$street.insertAfter($("#area"));
-
 					//删除之前选择省份加载的街道
 					$("#street").children(":not(:first)").remove();
 					
 					//接收json数据
 					var dataObj = eval("("+data+")"); //转换为json对象 
-
 					$.each(dataObj,function(idx,item){ 
 											 
 						$option_new = $("<option value=\""+item.streetID+"\">"+item.street+"</option>");
 						$option_new.insertAfter($("#street").children(":first"));
-
 						//如果有第四级
 						if($("#street").length > 0){
-
 							$("#street").live("change",function(){
 							
 								//清空隐藏域
@@ -276,22 +243,17 @@ select{ margin-left:5px;}
 								
 								//遍历option
 								$(this).children().each(function(){
-
 									if($(this).val() == $(this).parent().val()){
-
 										//选中该条
 										$(this).attr("selected",true);
 										
 										//添加隐藏域并把把该条的id放入隐藏域
 										$sid = $("<input type=\"hidden\" id=\"sid\" name=\"sid\">");
 										$s = $("<input type=\"hidden\" id=\"s\" name=\"s\">");
-
 										$sid.insertAfter($("#a"));
 										$s.insertAfter($("#sid"));
-
 											//排除第一条(即"请选择")
 											if( $(this).parent().val() !== $(this).parent().children(":first").val() ){
-
 												//选中该条
 												$(this).attr("selected",true);
 												
@@ -309,7 +271,6 @@ select{ margin-left:5px;}
 										//没有选中的去掉之前的selected
 										$(this).removeAttr("selected");
 									}
-
 								});	
 							});
 						}
@@ -322,14 +283,11 @@ select{ margin-left:5px;}
 				}
 			});
 		});
-
 		
-
 		//如果有一栏为空或者不可用，不允许提交
 		$("#sub").click(function(){
 		
 			if($("#street").length == 0){ 
-
 				if($("#pid").val() == "" || $("#p").val() == "" || $("#cid").val() == "" || $("#c").val() == "" || $("#aid").val() == "" || $("#a").val() == "" || $("#city").attr("disabled") === true || $("#area").attr("disabled") === true){
 			
 					alert("请完成选择");

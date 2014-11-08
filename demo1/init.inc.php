@@ -7,7 +7,7 @@
 //根目录路径方式，用于Smarty设置
 define("ROOT",str_replace("\\","/",dirname(__FILE__))."/");
 
-require ROOT.'libs/Smarty.class.php';
+require ROOT.'../libs/Smarty.class.php';
 $smarty = new Smarty();
 
 //Smarty3设置默认路径
