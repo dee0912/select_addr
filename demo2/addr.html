@@ -657,6 +657,54 @@ form{ margin-top:20px; margin-left:20px;}
 			});
 
 
+
+			/*******************
+			* 点击街道菜单框时  *
+			********************/
+			$("#street").live("click",function(){
+			
+				if($("#aid").val() != ""){
+			
+					
+					//当下拉面板不存在时
+					if( $("#streettab").length == 0 ){
+		
+						//根据表单中的区域id的隐藏域和表单外区域id=a+id的隐藏域的id进行对比，从页面缓存中读取数据
+						$aid = $("#aid").val();
+										
+						//存在缓存，直接从页面的隐藏域读取数据
+						//取出缓存数据
+						var $bufferData = $('#s'+$aid).val();	
+		
+						var dataObj = eval("("+$bufferData+")"); 
+							
+						//给下拉面板加上ID
+						$dropdiv.attr("id","streettab").css({"top":"24px","left":"0px"});
+						//注意：此处不能使用$("#citytab")
+						$dropdiv.appendTo($("#scon"));
+
+						$.each(dataObj,function(idx,item){ 
+																		
+							//把获取到的数据追加至面板中
+							if( $("#street .span-new").length < dataObj.length ){
+
+								$span_new = $("<span class=\"span-new\" id=\""+item.streetID+"\">"+item.street+"</span>");
+								$span_new.appendTo($("#streettab"));
+							}
+						});
+						
+					}else{
+
+						$("#streettab .span-new").remove();
+						$("#streettab").remove();
+					}
+				}
+			});
+
+
+
+
+
 		//如果有一栏为空或者不可用，不允许提交
 		$("#sub").click(function(){
 		
